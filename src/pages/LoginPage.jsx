@@ -1,19 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Mail, ArrowLeft, Shield, Users, BookOpen } from 'lucide-react';
+import { Heart, Mail, ArrowLeft, Shield, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 
 export default function LoginPage() {
-  const { setUser } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setUser({ name: 'Aman Kumar', email });
-    navigate('/dashboard');
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'Sign in failed. Please try again.';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,10 +84,18 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    minLength={8}
                     className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-navy"
                   />
-                  <button type="submit" className="bg-navy text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition">
-                    Sign In
+                  {error && (
+                    <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2">{error}</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-navy text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Signing in…' : 'Sign In'}
                   </button>
                 </form>
               )}

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: harmohelp
+      POSTGRES_USER: harmohelp
+      POSTGRES_PASSWORD: harmohelp
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrate.sql:/docker-entrypoint-initdb.d/01_migrate.sql
+
+volumes:
+  pgdata:

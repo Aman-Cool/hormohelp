@@ -4,14 +4,32 @@ import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 
 export default function SignupPage() {
-  const { setUser } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setUser({ name: form.name, email: form.email });
-    navigate('/onboarding');
+    setError('');
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await signup(form.name, form.email, form.password);
+      navigate('/onboarding');
+    } catch (err) {
+      const apiErrors = err?.response?.data?.errors;
+      const msg = apiErrors
+        ? apiErrors.map((e) => e.msg).join(' ')
+        : err?.response?.data?.error || 'Sign up failed. Please try again.';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -48,14 +66,22 @@ export default function SignupPage() {
               />
               <input
                 type="password"
-                placeholder="Create a password"
+                placeholder="Create a password (min 8 characters)"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
+                minLength={8}
                 className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-navy"
               />
-              <button type="submit" className="bg-navy text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition">
-                Create Account
+              {error && (
+                <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2">{error}</p>
+              )}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-navy text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Creating account…' : 'Create Account'}
               </button>
             </form>
 

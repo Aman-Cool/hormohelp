@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Info } from 'lucide-react';
+import api from '../api/axios';
 
 const steps = ['Personal Info', 'Medical History', 'Health Goals', 'Privacy & Terms'];
 
 export default function OnboardingPage() {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState({
     firstName: user?.name?.split(' ')[0] || '',
     lastName: user?.name?.split(' ')[1] || '',
@@ -18,9 +20,30 @@ export default function OnboardingPage() {
     emergencyPhone: '',
   });
 
-  const next = () => {
-    if (step < steps.length - 1) setStep(step + 1);
-    else navigate('/dashboard');
+  const next = async () => {
+    if (step < steps.length - 1) {
+      setStep(step + 1);
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await api.patch('/users/me', {
+        onboarding_data: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          dob: form.dob,
+          phone: form.phone,
+          emergencyName: form.emergencyName,
+          emergencyPhone: form.emergencyPhone,
+          completedAt: new Date().toISOString(),
+        },
+      });
+    } catch (_) {
+      // Non-blocking — onboarding data is best-effort
+    } finally {
+      setIsSaving(false);
+    }
+    navigate('/dashboard');
   };
 
   return (
@@ -139,9 +162,10 @@ export default function OnboardingPage() {
           </button>
           <button
             onClick={next}
-            className="bg-navy text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition flex items-center gap-2"
+            disabled={isSaving}
+            className="bg-navy text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Next →
+            {isSaving ? 'Saving…' : 'Next →'}
           </button>
         </div>
       </div>

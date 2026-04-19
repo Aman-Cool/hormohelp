@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Block authenticated-only routes from being indexed
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /symptom-tracker
+Disallow: /community
+Disallow: /consultations
+Disallow: /shop
+Disallow: /verify-email
+
+Sitemap: https://harmohelp.com/sitemap.xml

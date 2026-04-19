@@ -7,8 +7,13 @@ const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
+const authRoutes     = require('./routes/auth');
+const userRoutes     = require('./routes/users');
+const symptomRoutes  = require('./routes/symptoms');
+const postRoutes     = require('./routes/posts');
+const bookingRoutes  = require('./routes/bookings');
+const shopRoutes     = require('./routes/shop');
+const orderRoutes    = require('./routes/orders');
 
 const app = express();
 
@@ -24,8 +29,13 @@ app.use(cors({
 app.use(express.json({ limit: '16kb' }));
 app.use(cookieParser());
 
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
+app.use('/auth',           authRoutes);
+app.use('/users',          userRoutes);
+app.use('/api/symptoms',   symptomRoutes);
+app.use('/api/posts',      postRoutes);
+app.use('/api/bookings',   bookingRoutes);
+app.use('/api',            shopRoutes);
+app.use('/api/orders',     orderRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

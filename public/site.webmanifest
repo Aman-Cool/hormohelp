@@ -1,0 +1,17 @@
+{
+  "name": "HarmoHelp",
+  "short_name": "HarmoHelp",
+  "description": "Hormonal wellness tracking, education, and community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFBEF",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

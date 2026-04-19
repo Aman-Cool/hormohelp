@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+
 import { Heart, ArrowLeft, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
@@ -19,8 +20,12 @@ export default function SignupPage() {
     }
     setIsSubmitting(true);
     try {
-      await signup(form.name, form.email, form.password);
-      navigate('/onboarding');
+      const result = await signup(form.name, form.email, form.password);
+      if (result?.requiresVerification) {
+        navigate('/verify-email', { state: { email: form.email } });
+      } else {
+        navigate('/onboarding');
+      }
     } catch (err) {
       const apiErrors = err?.response?.data?.errors;
       const msg = apiErrors
@@ -83,6 +88,12 @@ export default function SignupPage() {
               >
                 {isSubmitting ? 'Creating account…' : 'Create Account'}
               </button>
+              <p className="text-xs text-gray-400 text-center leading-relaxed">
+                By signing up you agree to our{' '}
+                <Link to="/terms" className="text-navy hover:underline font-medium">Terms of Service</Link>
+                {' '}and{' '}
+                <Link to="/privacy" className="text-navy hover:underline font-medium">Privacy Policy</Link>.
+              </p>
             </form>
 
             <div className="mt-6 text-center text-sm text-gray-400">

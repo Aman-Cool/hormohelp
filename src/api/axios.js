@@ -30,6 +30,18 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
+    // Unverified email — redirect to verify page from any protected route
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.code === 'EMAIL_NOT_VERIFIED'
+    ) {
+      const publicPaths = ['/', '/login', '/signup', '/verify-email'];
+      if (!publicPaths.includes(window.location.pathname)) {
+        window.location.href = '/verify-email';
+      }
+      return Promise.reject(error);
+    }
+
     if (error.response?.status !== 401 || original._retry) {
       return Promise.reject(error);
     }
@@ -37,7 +49,12 @@ api.interceptors.response.use(
     // Don't retry the refresh endpoint itself — that would loop
     if (original.url === '/auth/refresh') {
       clearToken();
-      window.location.href = '/login';
+      // Only hard-redirect if currently on a protected page; on public pages
+      // just reject and let AuthContext's catch block handle it cleanly.
+      const publicPaths = ['/', '/login', '/signup'];
+      if (!publicPaths.includes(window.location.pathname)) {
+        window.location.href = '/login';
+      }
       return Promise.reject(error);
     }
 

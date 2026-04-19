@@ -1,0 +1,19 @@
+PLACEHOLDER — replace this file with a real 1200×630 PNG before launch.
+
+Recommended design:
+  - Background: #1a1a2e (navy) or a gradient from #1a1a2e to #2d2d4e
+  - Logo: "♥ HarmoHelp" in white, large, bold (top-left or centered)
+  - Tagline: "Hormonal Wellness Platform" in #D4B83A (gold) below the logo
+  - Optional: a subtle wellness wave graphic or a screenshot of the dashboard
+  - Bottom strip: "harmohelp.com" in small cream text
+
+Tools to generate this image:
+  - Figma / Canva (free)
+  - https://og-playground.vercel.app
+  - satori (npm) for code-generated OG images
+
+File requirements:
+  - Exactly 1200 × 630 pixels
+  - PNG or JPG, under 8 MB (under 1 MB recommended for performance)
+  - Place the final file at: public/og-image.png
+  - Update the og:image meta in index.html if the filename changes

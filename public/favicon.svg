@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Navy background -->
+  <rect width="32" height="32" rx="8" fill="#1a1a2e"/>
+  <!-- Wellness wave in gold — represents hormonal rhythm -->
+  <path d="M4 18 Q8 10 12 18 Q16 26 20 18 Q24 10 28 18"
+        stroke="#D4B83A" stroke-width="3" fill="none"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Small dot accent at peak -->
+  <circle cx="16" cy="26" r="2" fill="#FFF3CC"/>
+</svg>

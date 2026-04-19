@@ -67,8 +67,15 @@ export function AuthProvider({ children }) {
 
   const signup = useCallback(async (name, email, password) => {
     const { data } = await api.post('/auth/signup', { name, email, password });
+    // When email verification is required the server returns no tokens yet
+    if (data.requiresVerification) return data;
     applySession(data.accessToken, data.user);
     return data.user;
+  }, [applySession]);
+
+  // Called by VerifyEmailPage after the token is confirmed server-side
+  const applyVerifiedSession = useCallback((accessToken, userData) => {
+    applySession(accessToken, userData);
   }, [applySession]);
 
   const logout = useCallback(async () => {
@@ -82,7 +89,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, applyVerifiedSession }}>
       {children}
     </AuthContext.Provider>
   );

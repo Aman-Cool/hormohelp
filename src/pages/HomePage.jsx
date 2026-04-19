@@ -217,11 +217,11 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-100 py-6 px-8 flex items-center justify-between text-sm text-gray-500">
         <div className="flex gap-6">
-          <a href="#" className="hover:text-navy">Privacy Policy</a>
-          <a href="#" className="hover:text-navy">Terms of Service</a>
-          <a href="#" className="hover:text-navy">Support</a>
+          <Link to="/privacy" className="hover:text-navy">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-navy">Terms of Service</Link>
+          <a href="mailto:support@harmohelp.com" className="hover:text-navy">Support</a>
         </div>
-        <span>© 2024 HarmoHelp. Empowering hormonal wellness.</span>
+        <span>© {new Date().getFullYear()} HarmoHelp. Empowering hormonal wellness.</span>
       </footer>
     </div>
   );

@@ -1,0 +1,90 @@
+version: '3.9'
+
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       harmohelp
+      POSTGRES_USER:     harmohelp
+      POSTGRES_PASSWORD: harmohelp
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./server/migrate.sql:/docker-entrypoint-initdb.d/01_migrate.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U harmohelp']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Go auth-service ──────────────────────────────────────────────────────────
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '8001:8001'
+    environment:
+      PORT:                 '8001'
+      NODE_ENV:             production
+      DATABASE_URL:         postgresql://harmohelp:harmohelp@postgres:5432/harmohelp
+      JWT_PRIVATE_KEY_PATH: /run/secrets/auth_private_key
+      JWT_PUBLIC_KEY_PATH:  /run/secrets/auth_public_key
+      FRONTEND_ORIGIN:      ${FRONTEND_ORIGIN:-http://localhost:5173}
+      SMTP_HOST:            ${SMTP_HOST}
+      SMTP_PORT:            ${SMTP_PORT:-587}
+      SMTP_SECURE:          ${SMTP_SECURE:-false}
+      SMTP_USER:            ${SMTP_USER}
+      SMTP_PASS:            ${SMTP_PASS}
+      SMTP_FROM:            ${SMTP_FROM}
+    secrets:
+      - auth_private_key
+      - auth_public_key
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Node.js API ──────────────────────────────────────────────────────────────
+  node-api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    environment:
+      PORT:                 '4000'
+      NODE_ENV:             production
+      DATABASE_URL:         postgresql://harmohelp:harmohelp@postgres:5432/harmohelp
+      AUTH_SERVICE_URL:     http://auth-service:8001
+      AUTH_PUBLIC_KEY_PATH: /run/secrets/auth_public_key
+      FRONTEND_ORIGIN:      ${FRONTEND_ORIGIN:-http://localhost:5173}
+      RAZORPAY_KEY_ID:      ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET:  ${RAZORPAY_KEY_SECRET}
+    secrets:
+      - auth_public_key
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+# Docker secrets: mount the PEM files without baking them into the image.
+# To create them locally:
+#   docker secret create auth_private_key ./auth_private.pem
+#   docker secret create auth_public_key  ./auth_public.pem
+#
+# For local compose (not swarm), use:
+secrets:
+  auth_private_key:
+    file: ./auth_private.pem
+  auth_public_key:
+    file: ./auth_public.pem
+
+volumes:
+  pgdata:

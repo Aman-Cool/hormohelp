@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# RSA private key — never commit
+auth_private.pem
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

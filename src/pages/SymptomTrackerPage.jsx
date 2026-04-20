@@ -62,8 +62,6 @@ export default function SymptomTrackerPage() {
         notes,
       });
       setRecentLogs((prev) => [newLog, ...prev.slice(0, 4)]);
-      const { data: newStats } = await api.get('/api/symptoms/stats');
-      setStats(newStats);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       setSelected([]);
@@ -77,9 +75,15 @@ export default function SymptomTrackerPage() {
       const msg = err?.response?.data?.error || 'Failed to save. Please try again.';
       setSaveError(msg);
       toast.error(msg);
+      return;
     } finally {
       setIsSaving(false);
     }
+    // Best-effort stats refresh — failure here doesn't affect the confirmed save
+    try {
+      const { data: newStats } = await api.get('/api/symptoms/stats');
+      setStats(newStats);
+    } catch (_) {}
   };
 
   const formatDate = (d) =>

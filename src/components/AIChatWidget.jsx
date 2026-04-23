@@ -1,7 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createModel } from '../lib/ai';
+
+const PROTECTED_PATHS = [
+  '/dashboard', '/symptom-tracker', '/shop',
+  '/education', '/community', '/consultations', '/onboarding',
+];
 
 const SYSTEM = `You are Harmo, a friendly hormonal health education assistant on HarmoHelp.
 
@@ -23,6 +29,7 @@ const STARTERS = [
 
 export default function AIChatWidget() {
   const { user } = useAuth();
+  const { pathname } = useLocation();
   const [isOpen, setIsOpen]     = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput]       = useState('');
@@ -75,7 +82,7 @@ export default function AIChatWidget() {
     }
   }, [streaming]);
 
-  if (!user) return null;
+  if (!user || !PROTECTED_PATHS.includes(pathname)) return null;
 
   return (
     <>

@@ -16,7 +16,7 @@ function Section({ title, children }) {
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-[#FFFBEF]">
-      <header className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100">
+      <header className="flex items-center justify-between px-4 sm:px-8 py-4 bg-white border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-full font-bold text-lg">
           <Heart size={18} fill="white" /> HarmoHelp
         </Link>
@@ -28,7 +28,7 @@ export default function TermsOfServicePage() {
           <ArrowLeft size={14} /> Back to Home
         </Link>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-10 shadow-sm">
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-10 shadow-sm">
           <h1 className="text-3xl font-black text-navy mb-1">Terms of Service</h1>
           <p className="text-gray-400 text-sm mb-10">Last updated: {LAST_UPDATED}</p>
 

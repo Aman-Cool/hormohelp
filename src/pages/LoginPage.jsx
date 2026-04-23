@@ -30,7 +30,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-4 border-b border-gray-100">
+      <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-full font-bold text-lg">
           <Heart size={18} fill="white" /> HarmoHelp
         </Link>
@@ -39,7 +39,7 @@ export default function LoginPage() {
 
       <div className="flex flex-1">
         {/* Left: Form */}
-        <div className="flex flex-col items-center justify-center flex-1 px-8 py-12">
+        <div className="flex flex-col items-center justify-center flex-1 px-4 sm:px-8 py-12">
           <div className="w-full max-w-sm">
             <h1 className="text-4xl font-black text-navy mb-2 text-center">Welcome Back</h1>
             <p className="text-gray-500 text-center mb-8">Sign in to continue your hormonal wellness journey</p>
@@ -162,13 +162,13 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <footer className="border-t border-gray-100 py-4 px-8 flex items-center justify-between text-sm text-gray-400">
-        <div className="flex gap-6">
+      <footer className="border-t border-gray-100 py-4 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400">
+        <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6">
           <Link to="/privacy" className="hover:text-navy">Privacy Policy</Link>
           <Link to="/terms" className="hover:text-navy">Terms of Service</Link>
           <a href="mailto:support@harmohelp.com" className="hover:text-navy">Support</a>
         </div>
-        <span>© {new Date().getFullYear()} HarmoHelp. Empowering hormonal wellness.</span>
+        <span className="text-center">© {new Date().getFullYear()} HarmoHelp. Empowering hormonal wellness.</span>
       </footer>
     </div>
   );

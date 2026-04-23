@@ -193,7 +193,7 @@ export default function VerifyEmailPage() {
 function Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#FFFBEF] flex flex-col">
-      <header className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100">
+      <header className="flex items-center justify-between px-4 sm:px-8 py-4 bg-white border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-full font-bold text-lg">
           <Heart size={18} fill="white" /> HarmoHelp
         </Link>

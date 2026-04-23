@@ -217,14 +217,14 @@ export default function ShopPage() {
         </div>
       )}
 
-      <div className="flex items-center gap-4 px-6 py-3 bg-white border-b border-gray-200">
+      <div className="flex items-center gap-4 px-4 sm:px-6 py-3 bg-white border-b border-gray-200">
         <Link to="/dashboard" className="flex items-center gap-2 text-sm text-gray-600 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50">
           🏠 Save Cart & Return to Dashboard
         </Link>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex items-start justify-between mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-black text-navy">Health & Wellness Shop</h1>
             <p className="text-gray-400 text-sm">Discover quality products for your hormonal health journey</p>
@@ -242,7 +242,7 @@ export default function ShopPage() {
             </button>
 
             {showCart && (
-              <div className="absolute right-0 top-11 w-80 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-4">
+              <div className="absolute right-0 top-11 w-80 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-bold text-navy">Your Cart</h3>
                   <button onClick={() => setShowCart(false)} className="text-gray-300 hover:text-gray-500">
@@ -304,8 +304,8 @@ export default function ShopPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex items-center gap-2 flex-1 max-w-xs border border-gray-200 rounded-xl px-3 py-2">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex items-center gap-2 flex-1 min-w-[160px] max-w-xs border border-gray-200 rounded-xl px-3 py-2">
             <Search size={16} className="text-gray-400" />
             <input
               value={search}
@@ -349,7 +349,7 @@ export default function ShopPage() {
           <>
             <p className="text-sm text-gray-400 mb-4">Showing {filtered.length} of {products.length} products</p>
 
-            <div className={`grid gap-4 mb-10 ${gridView ? 'grid-cols-4' : 'grid-cols-1'}`}>
+            <div className={`grid gap-4 mb-10 ${gridView ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
               {filtered.map((product) => (
                 <div key={product.id} className={`border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition ${!gridView ? 'flex gap-4' : ''}`}>
                   <img src={product.image_url} alt={product.name} loading="lazy" width={gridView ? 400 : 160} height={gridView ? 176 : 128} className={`object-cover ${gridView ? 'w-full h-44' : 'w-40 h-32 flex-shrink-0'}`} />
@@ -378,7 +378,7 @@ export default function ShopPage() {
         )}
 
         {/* Footer info */}
-        <div className="grid grid-cols-3 gap-6 py-8 border-t border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-8 border-t border-gray-200">
           {[
             { icon: <Truck size={24} />, title: 'Free Shipping', desc: 'Free shipping on orders over ₹50' },
             { icon: <Shield size={24} />, title: 'Secure Checkout', desc: 'Your payment information is protected' },

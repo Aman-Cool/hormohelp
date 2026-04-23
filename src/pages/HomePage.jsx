@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Heart, BookOpen, Users, ArrowRight, Activity, TrendingUp } from 'lucide-react';
+import { Heart, BookOpen, Users, ArrowRight, Activity, TrendingUp, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 const tabs = [
@@ -39,55 +39,83 @@ const tabs = [
 export default function HomePage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('track');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const tab = tabs.find((t) => t.id === activeTab);
 
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <header className="flex items-center justify-between px-8 py-4 sticky top-0 bg-white/90 backdrop-blur z-20 border-b border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-navy text-white px-4 py-2 rounded-full font-bold text-lg">
-            <Heart size={18} fill="white" /> HarmoHelp
+      <header className="sticky top-0 bg-white/90 backdrop-blur z-20 border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 sm:px-8 py-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 bg-navy text-white px-3 sm:px-4 py-2 rounded-full font-bold text-base sm:text-lg">
+              <Heart size={16} fill="white" /> HarmoHelp
+            </div>
+            <span className="hidden sm:inline text-sm text-gray-500 border border-gray-200 rounded-full px-3 py-1">Hormone Education</span>
           </div>
-          <span className="text-sm text-gray-500 border border-gray-200 rounded-full px-3 py-1">Hormone Education</span>
-        </div>
-        <nav className="hidden md:flex items-center gap-8">
-          <Link to="/education" className="text-gray-700 hover:text-navy font-medium">Education</Link>
-          <Link to="/shop" className="text-gray-700 hover:text-navy font-medium">Shop</Link>
-          <Link to="/community" className="text-gray-700 hover:text-navy font-medium">Community</Link>
-        </nav>
-        <div className="flex items-center gap-3">
-          {user ? (
-            <Link to="/dashboard" className="bg-navy text-white px-5 py-2 rounded-full font-medium flex items-center gap-2">
-              Dashboard <ArrowRight size={16} />
-            </Link>
-          ) : (
-            <>
-              <Link to="/login" className="text-gray-700 font-medium hover:text-navy">Sign In</Link>
-              <Link to="/signup" className="bg-navy text-white px-5 py-2 rounded-full font-medium flex items-center gap-2">
-                Start Your Journey <ArrowRight size={16} />
+          <nav className="hidden md:flex items-center gap-8">
+            <Link to="/education" className="text-gray-700 hover:text-navy font-medium">Education</Link>
+            <Link to="/shop" className="text-gray-700 hover:text-navy font-medium">Shop</Link>
+            <Link to="/community" className="text-gray-700 hover:text-navy font-medium">Community</Link>
+          </nav>
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <Link to="/dashboard" className="bg-navy text-white px-5 py-2 rounded-full font-medium flex items-center gap-2">
+                Dashboard <ArrowRight size={16} />
               </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link to="/login" className="text-gray-700 font-medium hover:text-navy">Sign In</Link>
+                <Link to="/signup" className="bg-navy text-white px-5 py-2 rounded-full font-medium flex items-center gap-2">
+                  Start Your Journey <ArrowRight size={16} />
+                </Link>
+              </>
+            )}
+          </div>
+          <button className="md:hidden p-2 rounded-lg hover:bg-gray-100" onClick={() => setMobileMenuOpen((v) => !v)}>
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-100 px-4 py-4 flex flex-col gap-3 bg-white">
+            <Link to="/education" className="text-gray-700 hover:text-navy font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Education</Link>
+            <Link to="/shop" className="text-gray-700 hover:text-navy font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
+            <Link to="/community" className="text-gray-700 hover:text-navy font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Community</Link>
+            <div className="border-t border-gray-100 pt-3 flex flex-col gap-2">
+              {user ? (
+                <Link to="/dashboard" className="bg-navy text-white px-5 py-2.5 rounded-full font-medium flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                  Dashboard <ArrowRight size={16} />
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-700 font-medium hover:text-navy py-2 text-center" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+                  <Link to="/signup" className="bg-navy text-white px-5 py-2.5 rounded-full font-medium flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                    Start Your Journey <ArrowRight size={16} />
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-[#FFFBEF] to-[#E8F4F8] min-h-[85vh] flex flex-col items-center justify-center text-center px-6 py-20">
-        <h1 className="text-6xl md:text-7xl font-black text-navy max-w-3xl leading-tight mb-6">
+      <section className="bg-gradient-to-b from-[#FFFBEF] to-[#E8F4F8] min-h-[85vh] flex flex-col items-center justify-center text-center px-4 sm:px-6 py-16 sm:py-20">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-navy max-w-3xl leading-tight mb-6">
           Your Journey to Hormonal Wellness Starts Here
         </h1>
-        <p className="text-xl text-gray-600 max-w-xl mb-2">
+        <p className="text-lg sm:text-xl text-gray-600 max-w-xl mb-2">
           Comprehensive education, personalized guidance, and community support for every stage of your health journey.
         </p>
       </section>
 
       {/* Tag line bar */}
-      <div className="bg-gradient-to-b from-[#E8F4F8] to-white flex items-center justify-between px-8 py-5">
+      <div className="bg-gradient-to-b from-[#E8F4F8] to-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-8 py-5">
         <p className="text-gray-700 max-w-xs text-sm font-medium">
           Evidence-based hormone education and personalized health tracking for informed decisions.
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <Link to="/login" className="text-gray-700 font-medium hover:text-navy">Sign In</Link>
           <Link to="/signup" className="bg-navy text-white px-5 py-2 rounded-full font-medium flex items-center gap-2">
             Start Your Journey <ArrowRight size={16} />
@@ -204,8 +232,8 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 px-6 bg-gradient-to-b from-[#FFFBEF] to-[#E8F4F8] text-center">
-        <h2 className="text-5xl font-black text-navy mb-4">Ready to Take Control of Your Hormonal Health?</h2>
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-b from-[#FFFBEF] to-[#E8F4F8] text-center">
+        <h2 className="text-3xl sm:text-5xl font-black text-navy mb-4">Ready to Take Control of Your Hormonal Health?</h2>
         <p className="text-gray-600 max-w-xl mx-auto mb-8 font-medium">
           Join thousands of users who are already on their journey to better hormonal wellness. It's free to get started.
         </p>
@@ -215,13 +243,13 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-6 px-8 flex items-center justify-between text-sm text-gray-500">
-        <div className="flex gap-6">
+      <footer className="bg-white border-t border-gray-100 py-6 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
+        <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6">
           <Link to="/privacy" className="hover:text-navy">Privacy Policy</Link>
           <Link to="/terms" className="hover:text-navy">Terms of Service</Link>
           <a href="mailto:support@harmohelp.com" className="hover:text-navy">Support</a>
         </div>
-        <span>© {new Date().getFullYear()} HarmoHelp. Empowering hormonal wellness.</span>
+        <span className="text-center sm:text-right">© {new Date().getFullYear()} HarmoHelp. Empowering hormonal wellness.</span>
       </footer>
     </div>
   );

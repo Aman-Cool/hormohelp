@@ -47,7 +47,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-6 py-8">
+    <div className="min-h-screen bg-white px-4 sm:px-6 py-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-black text-navy">Welcome to HarmoHelp!</h1>
@@ -64,20 +64,21 @@ export default function OnboardingPage() {
             />
           </div>
         </div>
-        <div className="flex justify-between text-xs text-gray-400 mb-10">
+        <div className="hidden sm:flex justify-between text-xs text-gray-400 mb-10">
           {steps.map((s, i) => (
             <span key={s} className={i <= step ? 'text-navy font-medium' : ''}>{s}</span>
           ))}
         </div>
+        <div className="sm:hidden text-xs text-gray-400 mb-10 text-center">{steps[step]}</div>
 
         {step === 0 && (
-          <div className="border border-gray-200 rounded-2xl p-8">
+          <div className="border border-gray-200 rounded-2xl p-5 sm:p-8">
             <div className="flex items-center gap-2 mb-2">
               <User size={18} className="text-gray-400" />
               <h2 className="font-bold text-lg">Personal Information</h2>
             </div>
             <p className="text-gray-400 text-sm mb-6">Help us get to know you better. This information helps us provide personalized insights.</p>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">First Name *</label>
                 <input

@@ -45,7 +45,7 @@ export default function CookieBanner() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 mt-4 justify-end">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4 sm:justify-end">
           <button
             onClick={decline}
             className="text-sm text-gray-500 hover:text-navy px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition"

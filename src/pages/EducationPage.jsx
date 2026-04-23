@@ -53,13 +53,13 @@ export default function EducationPage() {
   return (
     <div className="min-h-screen bg-white">
       <DashboardNav />
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex items-start justify-between mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-black text-navy">Educational Hub</h1>
             <p className="text-gray-400 text-sm">Learn about hormonal health through videos, articles, and interactive content</p>
           </div>
-          <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 w-56">
+          <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 w-full sm:w-56">
             <Search size={16} className="text-gray-400" />
             <input
               value={search}
@@ -86,7 +86,7 @@ export default function EducationPage() {
         </div>
 
         {/* Content type tabs */}
-        <div className="flex border-b border-gray-200 mb-6">
+        <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
           {contentTypes.map((t) => (
             <button
               key={t}
@@ -101,7 +101,7 @@ export default function EducationPage() {
         </div>
 
         {/* Content grid */}
-        <div className="grid grid-cols-3 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
           {filtered.map((item) => (
             <div key={item.id} className="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition">
               <div className="relative">
@@ -141,7 +141,7 @@ export default function EducationPage() {
             <TrendingUp size={16} className="text-gray-500" />
             <h3 className="font-semibold text-navy">Your Learning Progress</h3>
           </div>
-          <div className="grid grid-cols-3 gap-8 text-center mb-4">
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center mb-4">
             {[{ v: '0', l: 'Completed' }, { v: '0%', l: 'Progress' }, { v: '0', l: 'Total Points' }].map((s) => (
               <div key={s.l}>
                 <p className="text-3xl font-black text-navy">{s.v}</p>

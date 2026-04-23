@@ -1,4 +1,5 @@
 import DashboardNav from '../components/DashboardNav';
+import SymptomInsightCard from '../components/SymptomInsightCard';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { Heart, TrendingUp, Award, Target, Bell, Activity, Calendar, Package, ShoppingBag, BookOpen } from 'lucide-react';
@@ -11,15 +12,18 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [recentLogs, setRecentLogs] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/api/symptoms/stats').catch(() => null),
       api.get('/api/orders').catch(() => null),
-    ]).then(([statsRes, ordersRes]) => {
+      api.get('/api/symptoms?limit=7').catch(() => null),
+    ]).then(([statsRes, ordersRes, logsRes]) => {
       if (statsRes) setStats(statsRes.data);
       if (ordersRes) setOrders(ordersRes.data);
+      if (logsRes) setRecentLogs(logsRes.data.logs ?? []);
     }).finally(() => setLoadingStats(false));
   }, []);
 
@@ -223,12 +227,7 @@ export default function DashboardPage() {
               <p className="text-gray-400 text-sm">No achievements yet. Start tracking to earn your first badge!</p>
             </div>
 
-            <div className="border border-gray-200 rounded-2xl p-5">
-              <h3 className="font-semibold text-navy mb-3 flex items-center gap-2"><span>💡</span> Today's Health Tip</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                <strong>Did you know?</strong> Regular sleep patterns can significantly impact hormone regulation. Try to maintain consistent sleep and wake times to support your hormonal health.
-              </p>
-            </div>
+            <SymptomInsightCard logs={recentLogs} />
 
             <div className="border border-gray-200 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-3">

@@ -1,4 +1,5 @@
 import DashboardNav from '../components/DashboardNav';
+import SymptomInsightCard from '../components/SymptomInsightCard';
 import { useState, useEffect } from 'react';
 import { Heart, Calendar, Save } from 'lucide-react';
 import api from '../api/axios';
@@ -219,6 +220,8 @@ export default function SymptomTrackerPage() {
                 </div>
               ))}
             </div>
+
+            <SymptomInsightCard logs={recentLogs} />
 
             <div className="border border-gray-200 rounded-2xl p-5">
               <h3 className="font-semibold text-navy mb-3">Tracking Tips</h3>

@@ -4,7 +4,6 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import CookieBanner from './components/CookieBanner';
-import AIChatWidget from './components/AIChatWidget';
 
 const HomePage            = lazy(() => import('./pages/HomePage'));
 const LoginPage           = lazy(() => import('./pages/LoginPage'));
@@ -99,7 +98,6 @@ export default function App() {
         <BrowserRouter>
           <AppRoutes />
           <CookieBanner />
-          <AIChatWidget />
           <Toaster
             position="bottom-right"
             toastOptions={{

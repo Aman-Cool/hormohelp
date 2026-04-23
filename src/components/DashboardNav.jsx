@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Heart, Activity, BookOpen, Users, Calendar, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import AIChatWidget from './AIChatWidget';
 
 const navItems = [
   { to: '/dashboard',       icon: Heart,     label: 'HarmoHelp' },
@@ -21,6 +22,8 @@ export default function DashboardNav() {
 
   return (
     <>
+      <AIChatWidget />
+
       {/* Desktop nav — unchanged */}
       <nav className="hidden sm:flex items-center justify-center gap-2 py-3 border-b border-gray-200 sticky top-0 bg-white z-10">
         {navItems.map(({ to, icon: Icon, label }) => (

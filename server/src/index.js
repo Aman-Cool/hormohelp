@@ -18,7 +18,7 @@ const orderRoutes   = require('./routes/orders');
 const db = require('./db');
 
 async function migrate() {
-  const sql = fs.readFileSync(path.resolve(__dirname, '../../migrate.sql'), 'utf8');
+  const sql = fs.readFileSync(path.resolve(__dirname, '../migrate.sql'), 'utf8');
   await db.query(sql);
   console.log('[migrate] schema up to date');
 }

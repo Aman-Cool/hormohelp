@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom';
-
 import { Heart, ArrowLeft, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
@@ -27,11 +26,16 @@ export default function SignupPage() {
         navigate('/onboarding');
       }
     } catch (err) {
-      const apiErrors = err?.response?.data?.errors;
-      const msg = apiErrors
-        ? apiErrors.map((e) => e.msg).join(' ')
-        : err?.response?.data?.error || 'Sign up failed. Please try again.';
-      setError(msg);
+      const code = err?.code;
+      if (code === 'auth/email-already-in-use') {
+        setError('An account with this email already exists.');
+      } else if (code === 'auth/weak-password') {
+        setError('Password is too weak. Use at least 8 characters.');
+      } else if (code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else {
+        setError('Sign up failed. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -1,97 +1,74 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  onAuthStateChanged, signOut,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendEmailVerification, updateProfile,
+  signInWithPopup, GoogleAuthProvider,
+} from 'firebase/auth';
+import { auth } from '../firebase';
 import api from '../api/axios';
-import { setToken, clearToken } from '../api/tokenStore';
 
 export const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
-// Decodes a JWT payload without verifying — only used to read the exp claim
-function parseJwtPayload(token) {
-  try {
-    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(b64));
-  } catch {
-    return null;
-  }
-}
-
-let silentRefreshTimer = null;
-
-function scheduleRefresh(accessToken, onRefreshed) {
-  if (silentRefreshTimer) clearTimeout(silentRefreshTimer);
-  const payload = parseJwtPayload(accessToken);
-  if (!payload?.exp) return;
-  // Fire 60 s before the access token actually expires
-  const msUntilRefresh = payload.exp * 1000 - Date.now() - 60_000;
-  if (msUntilRefresh <= 0) {
-    onRefreshed();
-    return;
-  }
-  silentRefreshTimer = setTimeout(onRefreshed, msUntilRefresh);
+function mapFirebaseUser(fbUser) {
+  return {
+    id: fbUser.uid,
+    email: fbUser.email,
+    name: fbUser.displayName || fbUser.email?.split('@')[0] || '',
+    emailVerified: fbUser.emailVerified,
+  };
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const applySession = useCallback((accessToken, userData) => {
-    setToken(accessToken);
-    setUser(userData);
-    scheduleRefresh(accessToken, () => performSilentRefresh());
-  }, []);
-
-  const performSilentRefresh = useCallback(async () => {
-    try {
-      const { data } = await api.post('/auth/refresh');
-      applySession(data.accessToken, data.user);
-    } catch {
-      // Refresh token expired or invalid — user needs to sign in again
-      clearToken();
-      setUser(null);
-    }
-  }, [applySession]);
-
-  // On mount: attempt to restore the session using the HttpOnly refresh cookie
   useEffect(() => {
-    performSilentRefresh().finally(() => setIsLoading(false));
-    return () => {
-      if (silentRefreshTimer) clearTimeout(silentRefreshTimer);
-    };
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (!fbUser) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+      const mapped = mapFirebaseUser(fbUser);
+      if (fbUser.emailVerified) {
+        try {
+          await api.post('/users/sync', { name: mapped.name, email: mapped.email });
+        } catch (_) {}
+      }
+      setUser(mapped);
+      setIsLoading(false);
+    });
+    return unsubscribe;
   }, []);
 
   const login = useCallback(async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
-    applySession(data.accessToken, data.user);
-    return data.user;
-  }, [applySession]);
+    const { user: fbUser } = await signInWithEmailAndPassword(auth, email, password);
+    return mapFirebaseUser(fbUser);
+  }, []);
+
+  const loginWithGoogle = useCallback(async () => {
+    const provider = new GoogleAuthProvider();
+    const { user: fbUser } = await signInWithPopup(auth, provider);
+    return mapFirebaseUser(fbUser);
+  }, []);
 
   const signup = useCallback(async (name, email, password) => {
-    const { data } = await api.post('/auth/signup', { name, email, password });
-    // When email verification is required the server returns no tokens yet
-    if (data.requiresVerification) return data;
-    applySession(data.accessToken, data.user);
-    return data.user;
-  }, [applySession]);
-
-  // Called by VerifyEmailPage after the token is confirmed server-side
-  const applyVerifiedSession = useCallback((accessToken, userData) => {
-    applySession(accessToken, userData);
-  }, [applySession]);
+    const { user: fbUser } = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(fbUser, { displayName: name });
+    await sendEmailVerification(fbUser);
+    return { requiresVerification: true, email };
+  }, []);
 
   const logout = useCallback(async () => {
-    try { await api.post('/auth/logout'); } catch (_) {}
-    clearToken();
+    await signOut(auth);
     setUser(null);
-    if (silentRefreshTimer) {
-      clearTimeout(silentRefreshTimer);
-      silentRefreshTimer = null;
-    }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, applyVerifiedSession }}>
+    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
-

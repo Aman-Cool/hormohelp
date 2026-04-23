@@ -7,10 +7,25 @@ const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ─── PATCH /users/me ─────────────────────────────────────────────────────────
-// Saves onboarding data. Accepts any JSON payload and deep-merges into the
-// existing onboarding_data column via PostgreSQL's jsonb concatenation operator.
+// POST /users/sync — upserts a Firebase user into Postgres on first verified sign-in
+router.post('/sync', requireAuth, async (req, res) => {
+  const { name, email } = req.body;
+  try {
+    const { rows } = await db.query(
+      `INSERT INTO users (id, email, name)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, name = EXCLUDED.name
+       RETURNING id, email, name, onboarding_data`,
+      [req.user.id, email || req.user.email, name || req.user.name],
+    );
+    return res.json({ user: rows[0] });
+  } catch (err) {
+    console.error('post /users/sync error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
+// PATCH /users/me — saves onboarding data
 router.patch(
   '/me',
   requireAuth,
@@ -27,7 +42,7 @@ router.patch(
          SET onboarding_data = onboarding_data || $1::jsonb
          WHERE id = $2
          RETURNING id, email, name, onboarding_data`,
-        [JSON.stringify(onboarding_data), req.user.sub],
+        [JSON.stringify(onboarding_data), req.user.id],
       );
 
       if (rows.length === 0) return res.status(404).json({ error: 'User not found' });

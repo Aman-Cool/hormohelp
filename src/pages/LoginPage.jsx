@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,8 +20,29 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      const msg = err?.response?.data?.error || 'Sign in failed. Please try again.';
-      setError(msg);
+      const code = err?.code;
+      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+        setError('Incorrect email or password.');
+      } else if (code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please try again later.');
+      } else {
+        setError('Sign in failed. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await loginWithGoogle();
+      navigate('/dashboard');
+    } catch (err) {
+      if (err?.code !== 'auth/popup-closed-by-user') {
+        setError('Google sign-in failed. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -61,12 +82,19 @@ export default function LoginPage() {
                     <span className="text-gray-400 text-xs">OR CONTINUE WITH</span>
                     <div className="flex-1 h-px bg-gray-200" />
                   </div>
-                  <button className="w-full flex items-center justify-center gap-2 border border-gray-200 px-4 py-3 rounded-xl text-gray-400 mb-3 cursor-not-allowed" disabled>
+                  <button
+                    onClick={handleGoogleLogin}
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-2 border border-gray-200 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 transition mb-3 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
                     <span className="font-bold text-red-500">G</span> Continue with Google
                   </button>
                   <button className="w-full flex items-center justify-center gap-2 border border-gray-200 px-4 py-3 rounded-xl text-gray-400 cursor-not-allowed" disabled>
                     <span className="font-bold">🍎</span> Continue with Apple
                   </button>
+                  {error && (
+                    <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2 mt-3">{error}</p>
+                  )}
                 </>
               ) : (
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -96,6 +124,13 @@ export default function LoginPage() {
                     className="bg-navy text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Signing in…' : 'Sign In'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowEmailForm(false); setError(''); }}
+                    className="text-sm text-gray-400 hover:text-navy text-center"
+                  >
+                    ← Back to sign-in options
                   </button>
                 </form>
               )}

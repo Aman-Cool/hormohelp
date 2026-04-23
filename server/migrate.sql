@@ -1,44 +1,28 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Drop old UUID-based auth tables if they exist (clean migration to Firebase UIDs)
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'users' AND column_name = 'id' AND data_type = 'uuid'
+  ) THEN
+    DROP TABLE IF EXISTS orders, cart_items, products, bookings,
+      community_comments, community_posts, symptom_logs,
+      password_reset_tokens, refresh_tokens, users CASCADE;
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS users (
-  id                             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  email                          TEXT        UNIQUE NOT NULL,
-  password_hash                  TEXT        NOT NULL,
-  name                           TEXT        NOT NULL,
-  onboarding_data                JSONB       NOT NULL DEFAULT '{}',
-  email_verified                 BOOLEAN     NOT NULL DEFAULT FALSE,
-  verification_token_hash        TEXT,
-  verification_token_expires_at  TIMESTAMPTZ,
-  created_at                     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id              TEXT        PRIMARY KEY,  -- Firebase UID
+  email           TEXT        UNIQUE NOT NULL,
+  name            TEXT        NOT NULL,
+  onboarding_data JSONB       NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
-CREATE TABLE IF NOT EXISTS refresh_tokens (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token_hash  TEXT        UNIQUE NOT NULL,
-  expires_at  TIMESTAMPTZ NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_rt_token_hash ON refresh_tokens(token_hash);
-CREATE INDEX IF NOT EXISTS idx_rt_user_id    ON refresh_tokens(user_id);
-
-CREATE TABLE IF NOT EXISTS password_reset_tokens (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token_hash  TEXT        UNIQUE NOT NULL,
-  expires_at  TIMESTAMPTZ NOT NULL,
-  used        BOOLEAN     NOT NULL DEFAULT FALSE,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_prt_token_hash ON password_reset_tokens(token_hash);
-
--- Feature tables
 
 CREATE TABLE IF NOT EXISTS symptom_logs (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id     TEXT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   date        DATE        NOT NULL DEFAULT CURRENT_DATE,
   symptoms    JSONB       NOT NULL DEFAULT '[]',
   notes       TEXT        NOT NULL DEFAULT '',
@@ -53,7 +37,7 @@ CREATE INDEX IF NOT EXISTS idx_sl_user_date ON symptom_logs(user_id, date DESC);
 
 CREATE TABLE IF NOT EXISTS community_posts (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id     TEXT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title       TEXT        NOT NULL,
   body        TEXT        NOT NULL,
   category    TEXT        NOT NULL DEFAULT 'General Discussion',
@@ -66,7 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_cp_created ON community_posts(created_at DESC);
 CREATE TABLE IF NOT EXISTS community_comments (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id     UUID        NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id     TEXT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   body        TEXT        NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -75,7 +59,7 @@ CREATE INDEX IF NOT EXISTS idx_cc_post ON community_comments(post_id, created_at
 
 CREATE TABLE IF NOT EXISTS bookings (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id     TEXT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   expert_id   TEXT        NOT NULL DEFAULT 'Dr. Sarah Johnson',
   type        TEXT        NOT NULL CHECK (type IN ('video', 'phone', 'chat')),
   date        TEXT        NOT NULL,
@@ -100,7 +84,7 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE TABLE IF NOT EXISTS cart_items (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id     TEXT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   product_id  INTEGER     NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   quantity    INTEGER     NOT NULL DEFAULT 1 CHECK (quantity > 0),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -109,7 +93,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
 
 CREATE TABLE IF NOT EXISTS orders (
   id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id             UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id             TEXT        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   items               JSONB       NOT NULL DEFAULT '[]',
   total               NUMERIC(10,2) NOT NULL,
   status              TEXT        NOT NULL DEFAULT 'pending',

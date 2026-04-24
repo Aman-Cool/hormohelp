@@ -19,6 +19,8 @@ const VerifyEmailPage     = lazy(() => import('./pages/VerifyEmailPage'));
 const PrivacyPolicyPage   = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage  = lazy(() => import('./pages/TermsOfServicePage'));
 const SettingsPage        = lazy(() => import('./pages/SettingsPage'));
+const FAQPage             = lazy(() => import('./pages/FAQPage'));
+const GuidePage           = lazy(() => import('./pages/GuidePage'));
 const NotFoundPage        = lazy(() => import('./pages/NotFoundPage'));
 
 const PAGE_TITLES = {
@@ -34,6 +36,8 @@ const PAGE_TITLES = {
   '/community':       'Community Hub — HarmoHelp',
   '/consultations':   'Book a Consultation — HarmoHelp',
   '/settings':        'Settings — HarmoHelp',
+  '/faq':             'FAQ — HarmoHelp',
+  '/guide':           'How to Use — HarmoHelp',
   '/privacy':         'Privacy Policy — HarmoHelp',
   '/terms':           'Terms of Service — HarmoHelp',
 };
@@ -87,6 +91,8 @@ function AppRoutes() {
           <Route path="/community"       element={<ProtectedRoute element={<CommunityPage />} />} />
           <Route path="/consultations"   element={<ProtectedRoute element={<ConsultationsPage />} />} />
           <Route path="/settings"        element={<ProtectedRoute element={<SettingsPage />} />} />
+          <Route path="/faq"             element={<ProtectedRoute element={<FAQPage />} />} />
+          <Route path="/guide"           element={<ProtectedRoute element={<GuidePage />} />} />
           <Route path="*"               element={<NotFoundPage />} />
         </Routes>
       </Suspense>

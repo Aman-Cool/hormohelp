@@ -33,8 +33,12 @@ export default function SignupPage() {
         setError('Password is too weak. Use at least 8 characters.');
       } else if (code === 'auth/invalid-email') {
         setError('Please enter a valid email address.');
+      } else if (code === 'auth/unauthorized-domain') {
+        setError('Sign-up is not enabled for this domain. Please contact support.');
+      } else if (code === 'auth/network-request-failed') {
+        setError('Network error. Please check your connection and try again.');
       } else {
-        setError('Sign up failed. Please try again.');
+        setError(err?.message || 'Sign up failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

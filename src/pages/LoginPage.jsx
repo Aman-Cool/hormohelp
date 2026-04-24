@@ -25,8 +25,12 @@ export default function LoginPage() {
         setError('Incorrect email or password.');
       } else if (code === 'auth/too-many-requests') {
         setError('Too many failed attempts. Please try again later.');
+      } else if (code === 'auth/unauthorized-domain') {
+        setError('Sign-in is not enabled for this domain. Please contact support.');
+      } else if (code === 'auth/network-request-failed') {
+        setError('Network error. Please check your connection and try again.');
       } else {
-        setError('Sign in failed. Please try again.');
+        setError(err?.message || 'Sign in failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

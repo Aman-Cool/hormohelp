@@ -35,7 +35,7 @@ router.get('/stats', async (req, res) => {
     [req.user.id],
   );
 
-  const total = rows.length? parseInt(rows[0].total_count, 10) : 0;
+  const total = logs.length? parseInt(logs[0].total_count, 10) : 0;
 
   // streak: consecutive days from today
   let streak = 0;

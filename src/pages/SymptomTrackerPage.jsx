@@ -30,11 +30,18 @@ export default function SymptomTrackerPage() {
   const [stats, setStats] = useState(null);
   const [loadingLogs, setLoadingLogs] = useState(true);
 
+  const DAILY_LIMIT = 2;
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayCount = recentLogs.filter(
+    (l) => (l.date || '').slice(0, 10) === todayStr,
+  ).length;
+  const dailyLimitReached = todayCount >= DAILY_LIMIT;
+
   useEffect(() => {
     const load = async () => {
       try {
         const [logsRes, statsRes] = await Promise.all([
-          api.get('/api/symptoms?limit=5'),
+          api.get('/api/symptoms?limit=10'),
           api.get('/api/symptoms/stats'),
         ]);
         setRecentLogs(logsRes.data.logs);
@@ -162,19 +169,26 @@ export default function SymptomTrackerPage() {
                 />
               </div>
 
+              {dailyLimitReached && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 text-center">
+                  <p className="text-amber-800 text-sm font-semibold mb-0.5">Daily limit reached</p>
+                  <p className="text-amber-700 text-xs">You've logged symptoms {DAILY_LIMIT} times today. Come back tomorrow to log again.</p>
+                </div>
+              )}
+
               {saveError && (
                 <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2 mb-4">{saveError}</p>
               )}
 
               <button
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || dailyLimitReached}
                 className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed ${
                   saved ? 'bg-green-500 text-white' : 'bg-[#FFF3CC] text-navy border border-[#E8D88A] hover:bg-[#FFE88A]'
                 }`}
               >
                 <Save size={16} />
-                {isSaving ? 'Saving…' : saved ? 'Entry Saved!' : "Save Today's Entry"}
+                {isSaving ? 'Saving…' : saved ? 'Entry Saved!' : dailyLimitReached ? 'Limit reached for today' : "Save Today's Entry"}
               </button>
             </div>
           </div>

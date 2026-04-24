@@ -85,6 +85,8 @@ router.get('/stats', async (req, res) => {
   res.json({ total, streak, thisWeek, avgSeverity, mostCommon, healthScore, lineData, barData });
 });
 
+const DAILY_LOG_LIMIT = 2;
+
 // POST /api/symptoms
 router.post('/',
   body('date').optional().isDate(),
@@ -99,10 +101,23 @@ router.post('/',
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const { date, symptoms, notes = '', severity, mood, energy, sleep } = req.body;
+    const logDate = date || new Date().toISOString().slice(0, 10);
+
+    const { rows: [{ count }] } = await db.query(
+      `SELECT COUNT(*) FROM symptom_logs WHERE user_id = $1 AND date = $2`,
+      [req.user.id, logDate],
+    );
+    if (parseInt(count) >= DAILY_LOG_LIMIT) {
+      return res.status(429).json({
+        error: `You can only log symptoms ${DAILY_LOG_LIMIT} times per day.`,
+        code: 'DAILY_LIMIT_REACHED',
+      });
+    }
+
     const { rows: [log] } = await db.query(
       `INSERT INTO symptom_logs (user_id, date, symptoms, notes, severity, mood, energy, sleep)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [req.user.id, date || new Date().toISOString().slice(0, 10), JSON.stringify(symptoms), notes, severity, mood, energy, sleep],
+      [req.user.id, logDate, JSON.stringify(symptoms), notes, severity, mood, energy, sleep],
     );
     res.status(201).json(log);
   },

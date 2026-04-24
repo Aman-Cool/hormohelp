@@ -27,17 +27,15 @@ router.get('/', async (req, res) => {
 
 // GET /api/symptoms/stats  — used by dashboard
 router.get('/stats', async (req, res) => {
-  // use COUNT(*) OVER()
-  const { rows } = await db.query(
+  // NOTE: COUNT(*) OVER() is computed before LIMIT,
+  // so total_count reflects the full matching row count (not just the 30 returned)
+  const { rows: logs } = await db.query(
     `SELECT date, severity, mood, energy, sleep, symptoms, COUNT(*) OVER() AS total_count FROM symptom_logs
      WHERE user_id = $1 ORDER BY date DESC LIMIT 30`,
     [req.user.id],
   );
 
-  const logs = rows;
   const total = rows.length? parseInt(rows[0].total_count, 10) : 0;
-  // console.log("rows: ", logs, "Total: ", rows);
-
 
   // streak: consecutive days from today
   let streak = 0;

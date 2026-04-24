@@ -65,10 +65,14 @@ export default function AIChatWidget() {
           { role: 'assistant', content: full },
         ]);
       }
-    } catch {
+    } catch (err) {
+      console.error('[Harmo]', err?.code, err?.message, err);
+      const msg = err?.message?.includes('not found') || err?.code === 'not-found'
+        ? 'AI service not enabled yet — please contact support.'
+        : err?.message || 'Something went wrong. Please try again.';
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { role: 'assistant', content: 'Something went wrong. Please try again.' },
+        { role: 'assistant', content: msg },
       ]);
     } finally {
       setStreaming(false);

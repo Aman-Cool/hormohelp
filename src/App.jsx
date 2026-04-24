@@ -18,6 +18,7 @@ const ConsultationsPage   = lazy(() => import('./pages/ConsultationsPage'));
 const VerifyEmailPage     = lazy(() => import('./pages/VerifyEmailPage'));
 const PrivacyPolicyPage   = lazy(() => import('./pages/PrivacyPolicyPage'));
 const TermsOfServicePage  = lazy(() => import('./pages/TermsOfServicePage'));
+const SettingsPage        = lazy(() => import('./pages/SettingsPage'));
 const NotFoundPage        = lazy(() => import('./pages/NotFoundPage'));
 
 const PAGE_TITLES = {
@@ -32,6 +33,7 @@ const PAGE_TITLES = {
   '/education':       'Education — HarmoHelp',
   '/community':       'Community Hub — HarmoHelp',
   '/consultations':   'Book a Consultation — HarmoHelp',
+  '/settings':        'Settings — HarmoHelp',
   '/privacy':         'Privacy Policy — HarmoHelp',
   '/terms':           'Terms of Service — HarmoHelp',
 };
@@ -84,6 +86,7 @@ function AppRoutes() {
           <Route path="/education"       element={<ProtectedRoute element={<EducationPage />} />} />
           <Route path="/community"       element={<ProtectedRoute element={<CommunityPage />} />} />
           <Route path="/consultations"   element={<ProtectedRoute element={<ConsultationsPage />} />} />
+          <Route path="/settings"        element={<ProtectedRoute element={<SettingsPage />} />} />
           <Route path="*"               element={<NotFoundPage />} />
         </Routes>
       </Suspense>

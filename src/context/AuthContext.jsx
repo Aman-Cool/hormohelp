@@ -17,6 +17,8 @@ function mapFirebaseUser(fbUser) {
     email: fbUser.email,
     name: fbUser.displayName || fbUser.email?.split('@')[0] || '',
     emailVerified: fbUser.emailVerified,
+    avatar_url: '',
+    bio: '',
   };
 }
 
@@ -35,6 +37,10 @@ export function AuthProvider({ children }) {
       if (fbUser.emailVerified) {
         try {
           await api.post('/users/sync', { name: mapped.name, email: mapped.email });
+          const { data } = await api.get('/users/me');
+          mapped.name = data.user.name;
+          mapped.bio = data.user.bio || '';
+          mapped.avatar_url = data.user.avatar_url || '';
         } catch (_) {}
       }
       setUser(mapped);
@@ -66,8 +72,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const updateUserProfile = useCallback(async (fields) => {
+    const { data } = await api.patch('/users/profile', fields);
+    setUser((prev) => ({ ...prev, ...data.user }));
+    return data.user;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, signup, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, signup, logout, updateUserProfile }}>
       {children}
     </AuthContext.Provider>
   );

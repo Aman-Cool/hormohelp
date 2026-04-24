@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Mail, Camera, LogOut, Save, ArrowLeft } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { User, Mail, Camera, LogOut, Save, ArrowLeft, HelpCircle, BookOpen, ChevronRight } from 'lucide-react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
 import DashboardNav from '../components/DashboardNav';
@@ -183,6 +183,41 @@ export default function SettingsPage() {
                 Verified
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* Help & Resources */}
+        <section className="border border-gray-200 rounded-2xl p-6 mb-5">
+          <h2 className="text-base font-bold text-navy mb-4 flex items-center gap-2">
+            <HelpCircle size={16} /> Help &amp; Resources
+          </h2>
+          <div className="flex flex-col gap-2">
+            <Link
+              to="/guide"
+              className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition"
+            >
+              <div className="flex items-center gap-3">
+                <BookOpen size={15} className="text-[#D4B83A]" />
+                <div>
+                  <p className="text-sm font-semibold text-navy">How to use HarmoHelp</p>
+                  <p className="text-xs text-gray-400">Step-by-step guide to every feature</p>
+                </div>
+              </div>
+              <ChevronRight size={15} className="text-gray-400" />
+            </Link>
+            <Link
+              to="/faq"
+              className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition"
+            >
+              <div className="flex items-center gap-3">
+                <HelpCircle size={15} className="text-[#D4B83A]" />
+                <div>
+                  <p className="text-sm font-semibold text-navy">Frequently asked questions</p>
+                  <p className="text-xs text-gray-400">Quick answers to common questions</p>
+                </div>
+              </div>
+              <ChevronRight size={15} className="text-gray-400" />
+            </Link>
           </div>
         </section>
 

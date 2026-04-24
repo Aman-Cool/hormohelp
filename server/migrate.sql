@@ -16,9 +16,14 @@ CREATE TABLE IF NOT EXISTS users (
   id              TEXT        PRIMARY KEY,  -- Firebase UID
   email           TEXT        UNIQUE NOT NULL,
   name            TEXT        NOT NULL,
+  bio             TEXT        NOT NULL DEFAULT '',
+  avatar_url      TEXT        NOT NULL DEFAULT '',
   onboarding_data JSONB       NOT NULL DEFAULT '{}',
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio        TEXT NOT NULL DEFAULT '';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT NOT NULL DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS symptom_logs (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),

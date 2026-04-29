@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
   q += ` ORDER BY p.created_at DESC LIMIT 50`;
 
   const { rows } = await db.query(q, params);
-  const userId = req.user.id;
+  const userId = req.user.sub;
   res.json(rows.map((p) => ({
     ...p,
     liked: (p.likes || []).includes(userId),
@@ -53,7 +53,7 @@ router.post('/',
     const { rows: [post] } = await db.query(
       `INSERT INTO community_posts (user_id, title, body, category)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [req.user.id, title, postBody, category],
+      [req.user.sub, title, postBody, category],
     );
     res.status(201).json({ ...post, author_name: req.user.name, like_count: 0, comment_count: 0, liked: false });
   },
@@ -61,7 +61,7 @@ router.post('/',
 
 // POST /api/posts/:id/like  — toggle
 router.post('/:id/like', async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.aub;
   const { rows: [post] } = await db.query(
     `SELECT likes FROM community_posts WHERE id = $1`, [req.params.id],
   );
@@ -84,7 +84,7 @@ router.post('/:id/like', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { rowCount } = await db.query(
     `DELETE FROM community_posts WHERE id = $1 AND user_id = $2`,
-    [req.params.id, req.user.id],
+    [req.params.id, req.user.sub],
   );
   if (!rowCount) return res.status(404).json({ error: 'Not found' });
   res.json({ ok: true });
@@ -110,7 +110,7 @@ router.post('/:id/comments',
 
     const { rows: [comment] } = await db.query(
       `INSERT INTO community_comments (post_id, user_id, body) VALUES ($1, $2, $3) RETURNING *`,
-      [req.params.id, req.user.id, req.body.body],
+      [req.params.id, req.user.sub, req.body.body],
     );
     res.status(201).json({ ...comment, author_name: req.user.name });
   },
